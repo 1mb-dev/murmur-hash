@@ -1,6 +1,6 @@
 {
   "name": "murmur-hash",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Fast MurmurHash3 with 128-bit support for Node.js and browsers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -46,14 +46,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vnykmshr/murmur-hash.git"
+    "url": "git+https://github.com/1mb-dev/murmur-hash.git"
   },
-  "author": "vnykmshr",
+  "author": "1mb-dev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vnykmshr/murmur-hash/issues"
+    "url": "https://github.com/1mb-dev/murmur-hash/issues"
   },
-  "homepage": "https://github.com/vnykmshr/murmur-hash#readme",
+  "homepage": "https://github.com/1mb-dev/murmur-hash#readme",
   "engines": {
     "node": ">=20.0.0"
   }

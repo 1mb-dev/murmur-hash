@@ -12,7 +12,7 @@ function warnDeprecation(): void {
   console.warn(
     '[murmur-hash] The v3.x86/v3.x64 API is deprecated. ' +
       'Use hash32(), hash128(), hash128x64() instead. ' +
-      'See https://github.com/vnykmshr/murmur-hash#migration-from-v1'
+      'See https://github.com/1mb-dev/murmur-hash#migration-from-v1'
   );
 }
 
