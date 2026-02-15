@@ -24,6 +24,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
+    "lint": "tsc --noEmit",
     "test": "node --test --import tsx test/*.test.ts",
     "bench": "tsx bench/index.ts",
     "prepublishOnly": "npm run build && npm test"
