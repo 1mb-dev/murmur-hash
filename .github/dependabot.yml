@@ -18,6 +18,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # Major-bump hold (revisit 2026-05-27): typescript 6
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
