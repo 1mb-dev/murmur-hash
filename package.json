@@ -56,6 +56,6 @@
   },
   "homepage": "https://github.com/1mb-dev/murmur-hash#readme",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22"
   }
 }
