@@ -91,3 +91,4 @@ dist/
 todos/
 memory/
 .claude/
+.venv/
