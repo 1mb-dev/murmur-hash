@@ -1,7 +1,7 @@
 {
   "name": "murmur-hash",
   "version": "2.0.1",
-  "description": "Fast MurmurHash3 with 128-bit support for Node.js and browsers",
+  "description": "MurmurHash3 x86 32-bit, x86 128-bit and x64 128-bit, matching the C++ reference and Python mmh3",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -43,7 +43,12 @@
     "128-bit",
     "non-cryptographic",
     "fingerprint",
-    "bloom-filter"
+    "bloom-filter",
+    "mmh3",
+    "murmur3",
+    "x64",
+    "typescript",
+    "esm"
   ],
   "repository": {
     "type": "git",
