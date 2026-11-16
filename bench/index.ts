@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { hash32, hash128, hash128x64 } from '../src/index.ts';
+
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 interface BenchResult {
   name: string;
@@ -28,7 +31,7 @@ function formatNumber(n: number): string {
   return n.toLocaleString('en-US');
 }
 
-console.log('murmur-hash v2.0.0 Benchmark\n');
+console.log(`murmur-hash v${version} Benchmark\n`);
 console.log('Running benchmarks...\n');
 
 // Test data
