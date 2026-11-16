@@ -86,3 +86,8 @@ node_modules
 # Build output
 dist/
 
+
+# Local working material
+todos/
+memory/
+.claude/
