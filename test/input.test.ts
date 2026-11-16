@@ -1,5 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { hash32, hash128, hash128x64 } from '../src/index.ts';
 
@@ -50,4 +52,79 @@ test('input: Buffer hashes like the same bytes and the same string', () => {
   const buf = Buffer.from('héllo');
   assertSameHash(buf, new TextEncoder().encode('héllo'), 'Buffer');
   assert.strictEqual(hash32(buf), hash32('héllo'));
+});
+
+// Warnings are once per process, so each case runs in its own child.
+const root = fileURLToPath(new URL('..', import.meta.url));
+
+function runChild(body: string): { warnings: Array<{ code: string; message: string }>; out: unknown } {
+  const code = `
+    import { hash32, hash128, hash128x64, createHash128, createHash128x64 } from './src/index.ts';
+    const warnings = [];
+    process.on('warning', (w) => {
+      if (String(w.code).startsWith('MURMUR_HASH_')) warnings.push({ code: w.code, message: w.message });
+    });
+    const out = (() => { ${body} })();
+    process.on('exit', () => console.log(JSON.stringify({ warnings, out })));
+  `;
+  const r = spawnSync(
+    process.execPath,
+    ['--no-warnings', '--import', 'tsx', '--input-type=module', '-e', code],
+    { cwd: root, encoding: 'utf8' }
+  );
+  assert.strictEqual(r.status, 0, r.stderr);
+  return JSON.parse(r.stdout.trim().split('\n').pop()!);
+}
+
+const badInputs: Array<[string, string, string]> = [
+  ['null', 'null', "'null'"],
+  ['undefined', 'undefined', "''"],
+  ['42', '42', "'42'"],
+];
+
+for (const [label, expr, asString] of badInputs) {
+  test(`input: ${label} warns once and hashes as today`, () => {
+    const { warnings, out } = runChild(`
+      const x = ${expr};
+      return [
+        hash32(x) === hash32(${asString}),
+        hash32(x, 3) === hash32(${asString}, 3),
+        hash128(x) === hash128(${asString}),
+        hash128x64(x) === hash128x64(${asString}),
+      ];
+    `);
+    assert.deepStrictEqual(out, [true, true, true, true]);
+    assert.strictEqual(warnings.length, 1, JSON.stringify(warnings));
+    assert.strictEqual(warnings[0].code, 'MURMUR_HASH_INPUT');
+  });
+}
+
+const badOptions: Array<[string, string, string]> = [
+  ["hash128('x', 42)", "hash128('x', 42)", "hash128('x')"],
+  ["hash128x64('x', 42)", "hash128x64('x', 42)", "hash128x64('x')"],
+  ['createHash128(42)', "createHash128(42).update('x').digest()", "hash128('x')"],
+  ['createHash128x64(42)', "createHash128x64(42).update('x').digest()", "hash128x64('x')"],
+];
+
+for (const [label, call, unseeded] of badOptions) {
+  test(`options: ${label} warns once and keeps seed 0`, () => {
+    const { warnings, out } = runChild(`
+      const a = ${call};
+      const b = ${call};
+      return a === ${unseeded} && b === a;
+    `);
+    assert.strictEqual(out, true);
+    assert.strictEqual(warnings.length, 1, JSON.stringify(warnings));
+    assert.strictEqual(warnings[0].code, 'MURMUR_HASH_OPTIONS');
+    assert.match(warnings[0].message, /\{ seed: 42 \}/);
+  });
+}
+
+test('valid input and options emit no warning', () => {
+  const { warnings } = runChild(`
+    hash32('a'); hash32(new Uint8Array(2), 5); hash32(new ArrayBuffer(3));
+    hash128('a'); hash128('a', undefined); hash128('a', null); hash128('a', { seed: 1, output: 'bigint' });
+    hash128x64(Buffer.from('a'), {}); createHash128().update('a').digest(); createHash128x64({ seed: 2 }).digest();
+  `);
+  assert.deepStrictEqual(warnings, []);
 });
