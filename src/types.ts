@@ -13,6 +13,12 @@ export interface Hash128Options {
   output?: HashOutput;
 }
 
+/** Options whose output is a bigint. */
+export type BigintOptions = Hash128Options & { output: 'bigint' };
+
+/** Options whose output is a hex string (the default). */
+export type HexOptions = Hash128Options & { output?: 'hex' };
+
 /**
  * Input type for hash functions. Strings are hashed as UTF-8; binary input as its bytes.
  */
