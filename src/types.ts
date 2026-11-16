@@ -14,6 +14,6 @@ export interface Hash128Options {
 }
 
 /**
- * Input type for hash functions
+ * Input type for hash functions. Strings are hashed as UTF-8; binary input as its bytes.
  */
-export type HashInput = string | Uint8Array;
+export type HashInput = string | Uint8Array | ArrayBuffer | ArrayBufferView;

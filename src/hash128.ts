@@ -1,5 +1,5 @@
 import type { HashInput, Hash128Options } from './types.ts';
-import { toBytes, hexToBigInt } from './encoding.ts';
+import { toBytes, hexToBigInt, checkOptions } from './encoding.ts';
 
 // MurmurHash3 x86 128-bit constants
 const C1 = 0x239b961b;
@@ -218,6 +218,7 @@ export function hash128(
   input: HashInput,
   options?: Hash128Options
 ): string | bigint {
+  checkOptions(options, 'hash128');
   const seed = options?.seed ?? 0;
   const hex = compute(toBytes(input), seed);
 
@@ -235,6 +236,7 @@ export class Hash128Stream {
   private readonly outputFormat: 'hex' | 'bigint';
 
   constructor(options?: Hash128Options) {
+    checkOptions(options, 'createHash128');
     this.seed = options?.seed ?? 0;
     this.outputFormat = options?.output ?? 'hex';
   }
