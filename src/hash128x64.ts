@@ -1,4 +1,4 @@
-import type { HashInput, Hash128Options } from './types.ts';
+import type { HashInput, Hash128Options, BigintOptions, HexOptions } from './types.ts';
 import { toBytes, hexToBigInt, checkOptions } from './encoding.ts';
 
 // MurmurHash3 x64 128-bit constants (as pairs of 32-bit ints)
@@ -283,6 +283,9 @@ function compute(bytes: Uint8Array, seed: number): string {
 /**
  * Compute MurmurHash3 x64 128-bit hash.
  */
+export function hash128x64(input: HashInput, options: BigintOptions): bigint;
+export function hash128x64(input: HashInput, options?: HexOptions): string;
+export function hash128x64(input: HashInput, options?: Hash128Options): string | bigint;
 export function hash128x64(
   input: HashInput,
   options?: Hash128Options
@@ -298,7 +301,7 @@ export function hash128x64(
 }
 
 /** Streaming hasher. Note: data is buffered until digest(), not processed incrementally. */
-export class Hash128x64Stream {
+export class Hash128x64Stream<T extends string | bigint = string | bigint> {
   private chunks: Uint8Array[] = [];
   private totalLength = 0;
   private readonly seed: number;
@@ -317,7 +320,7 @@ export class Hash128x64Stream {
     return this;
   }
 
-  digest(): string | bigint {
+  digest(): T {
     const result = new Uint8Array(this.totalLength);
     let offset = 0;
     for (const chunk of this.chunks) {
@@ -327,15 +330,18 @@ export class Hash128x64Stream {
     const hex = compute(result, this.seed);
 
     if (this.outputFormat === 'bigint') {
-      return hexToBigInt(hex);
+      return hexToBigInt(hex) as T;
     }
-    return hex;
+    return hex as T;
   }
 }
 
 /**
  * Create a streaming hasher for MurmurHash3 x64 128-bit.
  */
+export function createHash128x64(options: BigintOptions): Hash128x64Stream<bigint>;
+export function createHash128x64(options?: HexOptions): Hash128x64Stream<string>;
+export function createHash128x64(options?: Hash128Options): Hash128x64Stream;
 export function createHash128x64(options?: Hash128Options): Hash128x64Stream {
   return new Hash128x64Stream(options);
 }

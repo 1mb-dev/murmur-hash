@@ -29,13 +29,13 @@ export const v3 = {
     },
     hash128(key: string, seed?: number): string {
       warnDeprecation();
-      return hash128(key, { seed }) as string;
+      return hash128(key, { seed });
     },
   },
   x64: {
     hash128(key: string, seed?: number): string {
       warnDeprecation();
-      return hash128x64(key, { seed }) as string;
+      return hash128x64(key, { seed });
     },
   },
 };
