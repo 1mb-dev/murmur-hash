@@ -4,7 +4,7 @@
 
 MurmurHash3 is a non-cryptographic hash function designed for fast hashing of general-purpose data. It's widely used in hash tables, bloom filters, and data partitioning where collision resistance matters more than cryptographic security.
 
-Most JavaScript implementations only provide 32-bit output. This limits their usefulness for applications requiring lower collision probability or larger hash spaces. This implementation provides both 32-bit and 128-bit variants, filling a gap in the JavaScript ecosystem.
+Most JavaScript implementations only provide 32-bit output. This limits their usefulness for applications requiring lower collision probability or larger hash spaces. This implementation provides both 32-bit and 128-bit variants.
 
 ## The Problem
 
@@ -14,7 +14,7 @@ When you need to hash data in JavaScript, you typically reach for one of the pop
 - **murmurhash** (757K weekly downloads): 32-bit only
 - **imurmurhash** (33M weekly downloads): 32-bit only, incremental
 
-If your application requires 128-bit hashes—for example, generating UUIDs, reducing collision probability in large datasets, or implementing certain distributed algorithms—you're left without options.
+If your application requires 128-bit hashes—for example, generating UUIDs, reducing collision probability in large datasets, or implementing certain distributed algorithms—the choice is narrow: `murmurhash3js-revisited` implements all three variants correctly but was last published in 2018.
 
 ## Architecture Overview
 
@@ -116,7 +116,7 @@ The x86 128-bit variant uses four 32-bit hash values processed in parallel:
 ```typescript
 import { hash128 } from 'murmur-hash';
 
-hash128('hello');                          // '2360ae465e6336c6ad45b3f4ad45b3f4'
+hash128('hello');                          // '2b2444a0db91def79adb31b69adb31b6'
 hash128('hello', { seed: 42 });            // with seed
 hash128('hello', { output: 'bigint' });    // as BigInt
 ```
@@ -141,9 +141,9 @@ The 64-bit emulation includes:
 - `rotl64()`: Rotation across 32-bit boundary
 - `xor64()`: Bitwise XOR
 
-### Streaming API
+### Incremental API
 
-For processing large data or unknown-length streams:
+For input that arrives in pieces. Chunks are buffered and hashed at `digest()`:
 
 ```typescript
 import { createHash32, createHash128, createHash128x64 } from 'murmur-hash';
